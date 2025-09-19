@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>WebRTC demo</title>
+    <style>
+    video {
+        width: 320px;
+        height: 240px;
+        border: 1px solid black;
+    }
+    
+    .robot-section {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .robot-section div {
+        margin: 10px 0;
+    }
+
+    .robot-section label {
+        display: block;
+        margin: 5px 0;
+    }
+
+    .robot-section input[type="range"] {
+        width: 200px;
+        margin: 0 10px;
+    }
+
+    #robot-log {
+        font-family: monospace;
+        font-size: 12px;
+        background-color: #f5f5f5;
+    }
+    </style>
+</head>
+<body>
+    <h1>WebRTC demo</h1>
+
+    <h2>Options</h2>
+    <div class="option">
+        <input id="use-datachannel" type="checkbox" checked>
+        <label for="use-datachannel">Use datachannel</label>
+        <select id="datachannel-parameters">
+            <option value='{"ordered": true}'>Ordered, reliable</option>
+            <option value='{"ordered": false, "maxRetransmits": 0}'>Unordered, no retransmissions</option>
+            <option value='{"ordered": false, "maxPacketLifetime": 500}'>Unordered, 500ms lifetime</option>
+        </select>
+    </div>
+    <div class="option">
+        <input id="use-audio" type="checkbox">
+        <label for="use-audio">Use audio</label>
+        <select id="audio-codec">
+            <option value="default" selected>Default codecs</option>
+            <option value="opus/48000/2">Opus</option>
+            <option value="PCMU/8000">PCMU</option>
+            <option value="PCMA/8000">PCMA</option>
+        </select>
+        <select id="audio-input"></select>
+    </div>
+    <div class="option">
+        <input id="use-video" type="checkbox">
+        <label for="use-video">Use video</label>
+        <select id="video-codec">
+            <option value="default" selected>Default codecs</option>
+            <option value="VP8/90000">VP8</option>
+            <option value="H264/90000">H264</option>
+        </select>
+        <select id="video-resolution">
+            <option value="" selected>Default resolution</option>
+            <option value="320x240">320x240</option>
+            <option value="640x480">640x480</option>
+            <option value="960x540">960x540</option>
+            <option value="1280x720">1280x720</option>
+        </select>
+        <select id="video-input"></select>
+    </div>
+    <div class="option">
+        <input id="use-stun" type="checkbox">
+        <label for="use-stun">Use STUN server</label>
+        <select id="video-transform">
+            <option value="none" selected>No transform</option>
+            <option value="edges">Edge detection</option>
+            <option value="cartoon">Cartoon effect</option>
+            <option value="rotate">Rotate</option>
+        </select>
+    </div>
+
+    <button id="start" onclick="start()">Start</button>
+    <button id="stop" style="display: none" onclick="stop()">Stop</button>
+
+    <h2>Robot Control</h2>
+    <div class="robot-section">
+        <h3>Send Joint Angles</h3>
+        <div>
+            <label>Joint 1: <input type="range" id="joint1" min="0" max="180" value="90"> <span id="joint1-value">90</span>°</label>
+        </div>
+        <div>
+            <label>Joint 2: <input type="range" id="joint2" min="0" max="180" value="45"> <span id="joint2-value">45</span>°</label>
+        </div>
+        <div>
+            <label>Joint 3: <input type="range" id="joint3" min="0" max="180" value="180"> <span id="joint3-value">180</span>°</label>
+        </div>
+        <div>
+            <label>Gripper: <input type="range" id="gripper" min="0" max="1" step="0.1" value="0.5"> <span id="gripper-value">0.5</span></label>
+        </div>
+        <button id="send-joint-data">Send Joint Data</button>
+    </div>
+
+    <h3>Robot Status</h3>
+    <pre id="robot-log" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">等待机器人数据...\n</pre>
+
+    <h2>State</h2>
+    <p>
+        ICE gathering state:
+        <span id="ice-gathering-state"></span>
+    </p>
+    <p>
+        ICE connection state:
+        <span id="ice-connection-state"></span>
+    </p>
+    <p>
+        Signaling state:
+        <span id="signaling-state"></span>
+    </p>
+
+    <div id="media" style="display: none">
+        <h2>Media</h2>
+
+        <audio id="audio" autoplay="true"></audio>
+        <video id="video" autoplay="true" playsinline="true"></video>
+
+        <h2>SDP</h2>
+
+        <h3>Offer</h3>
+        <pre id="offer-sdp"></pre>
+
+        <h3>Answer</h3>
+        <pre id="answer-sdp"></pre>
+    </div>
+
+    <h2>Data channel</h2>
+    <pre id="data-channel" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;"></pre>
+
+    <input type="text" id="custom-message" placeholder="input your message">
+    <button id="send-message">Send</button>
+
+    <script src="client.js"></script>
+</body>
+</html>
